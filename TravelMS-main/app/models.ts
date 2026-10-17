@@ -67,6 +67,38 @@ export interface TripDetail {
   itinerary: ItineraryItem[];
   history: TripEvent[];
 }
+export interface AiStatus {
+  available: boolean;
+  provider: string;
+}
+export interface AiItineraryDraft {
+  summary: string;
+  items: ItineraryItem[];
+  generated_at: string;
+}
+export interface AiBudgetInsights {
+  summary: string;
+  suggestions: string[];
+  snapshot: BudgetSummary & {
+    budget_usd: number;
+    spent: number;
+    expense_count: number;
+    categories: Record<Category, number>;
+    currency: string;
+  };
+  generated_at: string;
+}
+export interface AiReceiptDraft {
+  merchant: string | null;
+  amount: number | null;
+  currency: string | null;
+  expense_date: string | null;
+  category: Category;
+  description: string;
+  warnings: string[];
+  receipt_sha256: string;
+  expense_fingerprint: string;
+}
 export interface Expense {
   expense_id?: number;
   trip_id: number;

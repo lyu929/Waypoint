@@ -76,3 +76,16 @@ The personal edition was subsequently added to the existing private `lyu929/Trav
 The repository homepage, development record and historical inspection report have now been translated into English. Interface text, business messages and maintained source comments were already English. The international-text PDF test uses Unicode escapes to preserve its existing coverage while keeping the source readable in an English project.
 
 These latest language edits are local working changes. The user will review, commit and push them personally; no commit or push was performed for this language revision.
+
+## Phase 4: Optional AI assistance
+
+Implemented on October 17, 2026 (America/Los_Angeles), after the user's English documentation commit `8e2aa32e`.
+
+- **AI Trip Planner:** English draft generation from existing trip context and interests, editable/selectable activity cards, atomic reviewed imports, duplicate prevention and verified Activity events. Existing manual itinerary validation is shared by both entry paths.
+- **Smart Receipt Scan:** private inline PNG/JPEG/PDF extraction into a review dialog. Only explicit confirmation updates the expense fields. USD and trip-date checks remain enforced, and receipt/expense fingerprints reject stale drafts. Saved report snapshots are preserved.
+- **Budget Insights:** the server computes an exact-cent snapshot of category spending and budget state, then requests an explanation without changing business records.
+- **Optional provider:** server-side environment configuration, strict structured outputs, no automatic retry, bounded timeouts, per-user request limits and no overlap. The normal app has no fabricated AI mode. Core workflows remain available without an API key.
+- **English documentation:** `TravelMS-main/AI_SETUP.md` explains local setup, feature workflows, transmitted data, limits and live-provider verification. The README, course requirements and demonstration guide include the new features.
+- **Verification:** provider-contract tests and isolated MySQL/browser tests use deterministic test fixtures. No real API key was present, no live AI request was made, and no business record or current account password was changed by this phase. Latest results are recorded in `TEST_REPORT.md`.
+
+These AI changes remain local for the user to review, commit and push personally. No Git history, access settings, commit or remote push was changed.

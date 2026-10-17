@@ -11,6 +11,8 @@ import { IconComponent } from '../../shared/icon.component';
 import { BudgetComponent } from '../../shared/budget.component';
 import { TripReviewComponent } from '../../shared/trip-review.component';
 import { ReceiptComponent } from '../../shared/receipt.component';
+import { AiPlannerComponent } from '../../shared/ai-planner.component';
+import { AiBudgetComponent } from '../../shared/ai-budget.component';
 @Component({
   selector: 'app-trip-detail',
   imports: [
@@ -20,6 +22,8 @@ import { ReceiptComponent } from '../../shared/receipt.component';
     BudgetComponent,
     TripReviewComponent,
     ReceiptComponent,
+    AiPlannerComponent,
+    AiBudgetComponent,
   ],
   templateUrl: './trip-detail.component.html',
 })
@@ -151,6 +155,8 @@ export class TripDetailComponent extends PageState implements OnInit {
           ITINERARY_CREATED: 'Added an itinerary item',
           ITINERARY_UPDATED: 'Updated an itinerary item',
           ITINERARY_DELETED: 'Removed an itinerary item',
+          AI_ITINERARY_IMPORTED: 'Added reviewed AI itinerary items',
+          AI_RECEIPT_APPLIED: 'Applied reviewed receipt details',
         } as Record<string, string>
       )[event.event_type] || event.event_type
     );

@@ -2320,11 +2320,14 @@ textarea:focus {
 }
 .receipt-buttons {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   align-items: center;
 }
-.receipt-buttons button {
+.receipt-controls .receipt-buttons button {
   font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .receipt-error {
   max-width: 220px;
@@ -2382,6 +2385,245 @@ textarea:focus {
   max-width: 100%;
   margin: auto;
   background: #fff;
+}
+.ai-panel {
+  padding: 24px;
+  margin-bottom: 24px;
+  background: linear-gradient(125deg, #f0f5e9, #fff 65%);
+  border-color: #dce6d2;
+}
+.ai-heading,
+.ai-request-footer,
+.ai-card-heading,
+.ai-selection {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ai-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+.ai-heading h2 {
+  font-size: 19px;
+  letter-spacing: -0.5px;
+  margin: 6px 0;
+}
+.ai-heading p,
+.ai-draft-heading p,
+.ai-scan-intro p {
+  color: #65725f;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+}
+.ai-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: #dfeccb;
+  color: var(--green);
+}
+.ai-symbol app-icon {
+  width: 23px;
+  height: 23px;
+}
+.ai-body {
+  margin-top: 24px;
+  border-top: 1px solid #dce6d2;
+  padding-top: 22px;
+}
+.ai-request-footer {
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.ai-request-footer label {
+  width: min(220px, 100%);
+  margin-bottom: 0;
+}
+.ai-disclosure {
+  color: #697561;
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 16px 0 0;
+  white-space: normal;
+}
+.ai-note,
+.ai-feedback {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f6f0e2;
+  color: #735a35;
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 16px 0;
+  white-space: normal;
+}
+.ai-feedback {
+  background: #e8f0de;
+  color: var(--green);
+}
+.ai-draft {
+  margin-top: 28px;
+}
+.ai-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: #e4eddb;
+  color: #36562d;
+  padding: 6px 9px;
+  border-radius: 5px;
+}
+.ai-draft-heading h3 {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+  margin: 14px 0 8px;
+}
+.ai-selection {
+  font-size: 12px;
+  margin: 18px 0 12px;
+  flex-wrap: wrap;
+}
+.ai-selection > span {
+  margin-right: auto;
+  font-weight: 600;
+}
+.ai-draft-items,
+.ai-card-fields {
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  border: 0;
+}
+.ai-draft-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.ai-draft-card {
+  padding: 16px;
+  border: 1px solid #dae4d1;
+  border-radius: 12px;
+  background: #fff;
+  min-width: 0;
+}
+.ai-unselected {
+  background: #f6f7f3;
+}
+.ai-card-heading {
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.ai-card-heading .ai-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.ai-checkbox input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--green);
+}
+.ai-draft-card textarea {
+  min-height: 72px;
+}
+.ai-insights {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.ai-insights li {
+  margin-bottom: 6px;
+}
+.ai-budget-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.ai-budget-facts span,
+.ai-budget-facts strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.ai-budget-facts span {
+  font-size: 11px;
+  color: #697561;
+}
+.ai-budget-facts strong {
+  font-size: 19px;
+  letter-spacing: -0.4px;
+}
+.ai-receipt-dialog {
+  width: min(660px, calc(100vw - 32px));
+  white-space: normal;
+}
+.ai-receipt-dialog .form-heading p {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  margin-bottom: 0;
+}
+.ai-receipt-dialog form {
+  margin-top: 20px;
+}
+.ai-merchant {
+  font-weight: 600;
+  margin: 16px 0;
+}
+.ai-scan-intro {
+  text-align: center;
+  padding: 30px 15px;
+}
+.ai-scan-intro h3 {
+  margin: 18px 0 10px;
+  font-size: 20px;
+}
+.ai-existing {
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: #f3f5ef;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+@media (max-width: 900px) {
+  .ai-draft-items {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .ai-panel {
+    padding: 18px;
+  }
+  .ai-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ai-heading > button {
+    width: 100%;
+  }
+  .ai-request-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ai-request-footer label {
+    width: 100%;
+  }
+  .ai-budget-facts strong {
+    font-size: 16px;
+  }
 }
 @media (max-width: 600px) {
   .receipt-dialog {

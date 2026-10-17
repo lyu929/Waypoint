@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { databaseOptions, createPool } = require('../db');
 const { migrate } = require('../backend/schema');
 const { createApp } = require('../backend/app');
+const { createTestAi } = require('./ai-fixtures.cjs');
 const database = process.env.WAYPOINT_E2E_DB;
 let admin,
   pool,
@@ -42,7 +43,7 @@ async function main() {
       'INSERT INTO users (first_name,last_name,email,role,password_hash) VALUES (?,?,?,?,?)',
       [first, last, email, role, password],
     );
-  const app = createApp(pool, { rateLimit: false });
+  const app = createApp(pool, { rateLimit: false, ai: createTestAi() });
   app.use(express.static(built));
   app.get('*', (req, res) => res.sendFile(path.join(built, 'index.html')));
   server = app.listen(Number(process.env.WAYPOINT_E2E_PORT), '127.0.0.1', () =>

@@ -59,6 +59,7 @@ On the demonstration computer, Vancouver includes daily plans, a revision/resubm
 - Sign-in returns to the requested journey or Settings page. API and browser workflow tests use isolated databases.
 - Consistent backups and recovery into a new database preserve password hashes and receipt bytes while leaving the active database unchanged.
 - Redesigned login, overview, navigation, trip, expense, report and user pages support desktop and narrow screens.
+- Optional AI itinerary drafts, reviewed receipt extraction and budget explanations connect to existing workflows. See [AI setup](TravelMS-main/AI_SETUP.md) to configure your own server-side OpenAI API key; core workflows remain available without AI.
 
 Activity history records new actions after the upgrade; older approval events are not invented. Avatars use built-in icons. Email password reset, maps and multiple currencies are not implemented.
 

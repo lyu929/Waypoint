@@ -10,6 +10,10 @@ import {
   ReportStatus,
   TripDetail,
   ItineraryItem,
+  AiStatus,
+  AiItineraryDraft,
+  AiBudgetInsights,
+  AiReceiptDraft,
 } from '../models';
 export type { User, Trip, Expense, Report } from '../models';
 @Injectable({ providedIn: 'root' })
@@ -32,6 +36,30 @@ export class ApiService {
   }
   getTrip(id: number) {
     return this.http.get<TripDetail>('/api/trips/' + id);
+  }
+  getAiStatus() {
+    return this.http.get<AiStatus>('/api/ai/status');
+  }
+  generateItinerary(id: number, preferences: string, pace: string) {
+    return this.http.post<AiItineraryDraft>('/api/trips/' + id + '/ai/itinerary', {
+      preferences,
+      pace,
+    });
+  }
+  importItinerary(id: number, items: ItineraryItem[]) {
+    return this.http.post<{ added: number; skipped: number }>(
+      '/api/trips/' + id + '/itinerary/import',
+      { items },
+    );
+  }
+  getBudgetInsights(id: number) {
+    return this.http.post<AiBudgetInsights>('/api/trips/' + id + '/ai/budget', {});
+  }
+  scanReceipt(id: number) {
+    return this.http.post<AiReceiptDraft>('/api/expenses/' + id + '/ai/receipt', {});
+  }
+  applyReceiptDraft(id: number, draft: AiReceiptDraft) {
+    return this.http.post('/api/expenses/' + id + '/ai/receipt/apply', draft);
   }
   createItineraryItem(tripId: number, item: ItineraryItem) {
     return this.http.post('/api/trips/' + tripId + '/itinerary', item);

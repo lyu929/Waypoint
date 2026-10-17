@@ -18,22 +18,25 @@ The roles belong to different authenticated accounts. Demo buttons are shortcuts
 
 ## Functional requirements and traceability
 
-| ID    | Requirement                                                             | Implementation / evidence                                                                  |
-| ----- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| FR-01 | Register and sign in with protected passwords and an expiring session.  | `backend/app.js`, authentication interface and integration tests.                          |
-| FR-02 | Return to the requested authorized page after sign-in.                  | `app/shared/return-url.ts`, unit and browser tests.                                        |
-| FR-03 | Travelers access only their own records; Owners can review all records. | Server session, trip/report ownership checks and cross-user API tests.                     |
-| FR-04 | Create a trip with destination, dates, purpose and USD budget.          | Trips page; date/amount validation tests.                                                  |
-| FR-05 | Review a pending trip and require an explanation when returning it.     | Review dialog, status transition tests and browser workflow.                               |
-| FR-06 | Preserve actor, decision, comment and time in trip activity.            | `trip_events`, history integration tests. Historical events are not invented for old data. |
-| FR-07 | Add/edit/remove daily activities, transport, accommodation and notes.   | Journey Itinerary; ownership, date/time and completion tests.                              |
-| FR-08 | Record positive expenses in five categories within approved trip dates. | Expenses page and API tests for all categories.                                            |
-| FR-09 | Attach, replace, preview, download and remove a private receipt.        | Receipt controls, PNG/JPEG/PDF validation and ownership tests.                             |
-| FR-10 | Warn at 80% budget usage and show exact overrun.                        | Budget component, dashboard links, exact-cent boundary tests.                              |
-| FR-11 | Save a report snapshot; later expense edits do not alter it.            | `reports.snapshot`, snapshot and CSV integration tests.                                    |
-| FR-12 | Export saved reports to CSV and paginated PDF.                          | Reports and journey details; authenticated export and pagination tests.                    |
-| FR-13 | Edit one's name, phone, avatar and password.                            | Settings; profile protection, password verification and session revocation tests.          |
-| FR-14 | Back up business records and recover into a new database.               | Backup/restore commands; record-count, hash and receipt checksum tests.                    |
+| ID    | Requirement                                                             | Implementation / evidence                                                                       |
+| ----- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| FR-01 | Register and sign in with protected passwords and an expiring session.  | `backend/app.js`, authentication interface and integration tests.                               |
+| FR-02 | Return to the requested authorized page after sign-in.                  | `app/shared/return-url.ts`, unit and browser tests.                                             |
+| FR-03 | Travelers access only their own records; Owners can review all records. | Server session, trip/report ownership checks and cross-user API tests.                          |
+| FR-04 | Create a trip with destination, dates, purpose and USD budget.          | Trips page; date/amount validation tests.                                                       |
+| FR-05 | Review a pending trip and require an explanation when returning it.     | Review dialog, status transition tests and browser workflow.                                    |
+| FR-06 | Preserve actor, decision, comment and time in trip activity.            | `trip_events`, history integration tests. Historical events are not invented for old data.      |
+| FR-07 | Add/edit/remove daily activities, transport, accommodation and notes.   | Journey Itinerary; ownership, date/time and completion tests.                                   |
+| FR-08 | Record positive expenses in five categories within approved trip dates. | Expenses page and API tests for all categories.                                                 |
+| FR-09 | Attach, replace, preview, download and remove a private receipt.        | Receipt controls, PNG/JPEG/PDF validation and ownership tests.                                  |
+| FR-10 | Warn at 80% budget usage and show exact overrun.                        | Budget component, dashboard links, exact-cent boundary tests.                                   |
+| FR-11 | Save a report snapshot; later expense edits do not alter it.            | `reports.snapshot`, snapshot and CSV integration tests.                                         |
+| FR-12 | Export saved reports to CSV and paginated PDF.                          | Reports and journey details; authenticated export and pagination tests.                         |
+| FR-13 | Edit one's name, phone, avatar and password.                            | Settings; profile protection, password verification and session revocation tests.               |
+| FR-14 | Back up business records and recover into a new database.               | Backup/restore commands; record-count, hash and receipt checksum tests.                         |
+| FR-15 | Generate, review and selectively import an English AI itinerary draft.  | Optional provider, shared itinerary validation, atomic imports and duplicate prevention tests.  |
+| FR-16 | Extract receipt details and apply only reviewed valid USD fields.       | Private inline input, ownership checks, receipt/expense fingerprints and review workflow tests. |
+| FR-17 | Explain server-calculated budget and category totals with optional AI.  | Read-only snapshot, exact-cent totals, empty/zero-budget and browser tests.                     |
 
 ## Use cases
 
@@ -82,6 +85,10 @@ UC-05: A signed-in user changes their password after verifying the current one. 
 
 UC-06: The local operator creates a private database backup and restores it to a new database name. Recovery validates receipts and record counts, preserves password hashes, omits sessions and leaves the active database and configuration unchanged.
 
+UC-07: A Traveler requests an optional AI itinerary draft for their trip. The server validates access, bounds the request and sends only the relevant trip context to the configured provider. The Traveler edits and selects activities, then confirms an atomic import. Duplicate items are skipped and Activity records the reviewed import. Unconfigured, failed or invalid provider responses leave manual planning available.
+
+UC-08: A Traveler requests extraction of an attached receipt. The provider returns suggested fields without database writes. The Traveler reviews the USD amount, date, category and description before applying them. The server rechecks ownership, trip status, date range and receipt/expense fingerprints; stale drafts fail. Budget Insights independently explains a server-calculated aggregate snapshot without changing records. See `TravelMS-main/AI_SETUP.md` for provider setup, data sharing and operational limits.
+
 ## State models
 
 ```mermaid
@@ -113,9 +120,11 @@ flowchart LR
   db[(MySQL\nBusiness records + private receipts)]
   backups[Private JSON backup\nNew-database recovery]
   exports[CSV + PDF exports\nSaved report snapshot]
+  ai[Optional OpenAI API\nDrafts / receipt extraction / budget explanation]
   browser -->|same-origin /api requests| api
   api --> db
   api --> exports
+  api -->|explicit AI request, selected context only| ai
   db --> backups
   backups -->|explicit new target| db
 ```
@@ -214,16 +223,17 @@ erDiagram
 
 ## Personal extension compared with the original project
 
-| Original gap                             | Added implementation                                                                 |
-| ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| Inconsistent trip/category/report values | Unified statuses, transitions, categories and validation.                            |
-| Client-side role assumptions             | Server sessions, role/ownership enforcement and guarded routes.                      |
-| Destructive or inconsistent setup        | Preserving schema migration, private consistent backup and new-database recovery.    |
-| Incomplete reports                       | Immutable snapshots, submit/approve workflow, safe CSV and paginated PDF.            |
-| Basic interface                          | Waypoint brand, real dashboard statistics, responsive layouts and personal settings. |
-| No daily planning or review evidence     | Daily itinerary, exact budget alerts, required revision comments and history.        |
-| Receipt links only                       | Private validated upload, preview, replacement and download.                         |
-| Incomplete verification                  | Discovered unit tests, isolated API tests and repeatable browser workflows.          |
+| Original gap                             | Added implementation                                                                                 |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Inconsistent trip/category/report values | Unified statuses, transitions, categories and validation.                                            |
+| Client-side role assumptions             | Server sessions, role/ownership enforcement and guarded routes.                                      |
+| Destructive or inconsistent setup        | Preserving schema migration, private consistent backup and new-database recovery.                    |
+| Incomplete reports                       | Immutable snapshots, submit/approve workflow, safe CSV and paginated PDF.                            |
+| Basic interface                          | Waypoint brand, real dashboard statistics, responsive layouts and personal settings.                 |
+| No daily planning or review evidence     | Daily itinerary, exact budget alerts, required revision comments and history.                        |
+| Receipt links only                       | Private validated upload, preview, replacement and download.                                         |
+| Manual planning and receipt entry        | Optional reviewed AI itinerary drafts, private receipt extraction and aggregate budget explanations. |
+| Incomplete verification                  | Discovered unit tests, isolated API tests and repeatable browser workflows.                          |
 
 ## Demonstration and submission
 

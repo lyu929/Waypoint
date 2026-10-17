@@ -4,9 +4,10 @@ import { ApiService } from '../services/api.service';
 import { PageState } from './ui';
 import { IconComponent } from './icon.component';
 import { PdfPreviewComponent } from './pdf-preview.component';
+import { AiReceiptComponent } from './ai-receipt.component';
 @Component({
   selector: 'app-receipt',
-  imports: [IconComponent, PdfPreviewComponent],
+  imports: [IconComponent, PdfPreviewComponent, AiReceiptComponent],
   template: `<div class="receipt-controls">
     @if (expense.receipt_id) {
       <button
@@ -32,6 +33,17 @@ import { PdfPreviewComponent } from './pdf-preview.component';
         [attr.aria-label]="'Receipt file for expense ' + expense.expense_id"
       />
       <div class="receipt-buttons">
+        @if (expense.receipt_id) {
+          <button
+            type="button"
+            class="text-button small-link"
+            (click)="scanOpen = true"
+            [disabled]="busy"
+            [attr.aria-label]="'Scan receipt ' + expense.expense_id"
+          >
+            Scan with AI
+          </button>
+        }
         <button
           class="text-button small-link"
           (click)="fileInput.click()"
@@ -58,6 +70,13 @@ import { PdfPreviewComponent } from './pdf-preview.component';
     }
     @if (error) {
       <small class="field-error receipt-error" role="alert">{{ error }}</small>
+    }
+    @if (scanOpen) {
+      <app-ai-receipt
+        [expense]="expense"
+        (cancelled)="scanOpen = false"
+        (saved)="scanOpen = false; changed.emit()"
+      />
     }
     <dialog
       #viewer
@@ -100,6 +119,7 @@ export class ReceiptComponent extends PageState {
   @Output() changed = new EventEmitter<void>();
   @ViewChild('viewer') viewer!: ElementRef<HTMLDialogElement>;
   viewing = false;
+  scanOpen = false;
   constructor(private api: ApiService) {
     super();
   }

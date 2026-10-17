@@ -34,7 +34,15 @@ The login page has demo buttons for these local sample accounts. Existing passwo
 5. Attach a private receipt from the **Receipt** column, preview it, and create a report from the journey's **Reports** tab. Export PDF/CSV, submit it, then sign in as Owner and approve it.
 6. Use **Settings** to update your profile or change your password using the current password.
 
-One computer is sufficient for both roles, the frontend, API, and database. Sample trips show the interface immediately; no external account or service is needed.
+One computer is sufficient for both roles, the frontend, API, and database. Sample trips show the interface immediately; the core application needs no external account or service. Optional AI assistance uses a separately configured OpenAI API connection.
+
+## Optional AI assistance
+
+- **AI Trip Planner:** generate an English itinerary draft from the trip's dates, budget and your interests. Edit and select activities before saving them together; duplicate imports are skipped and the reviewed action appears in Activity.
+- **Smart Receipt Scan:** extract a private receipt into a review form, then explicitly apply corrected USD expense fields. The server rejects stale drafts if the receipt or expense changed.
+- **Budget Insights:** explain an exact-cent snapshot of recorded spending and category totals without changing expenses or reports.
+
+Add `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-4.1-mini`) and optional `AI_TIMEOUT_MS` to the existing ignored `.env`, then restart the app. Keep working database settings. AI calls require internet access and provider allowance; the relevant inputs are sent to OpenAI only when requested. Without a key, the interface explains that AI is unavailable and manual workflows remain usable. See [AI_SETUP.md](AI_SETUP.md) for setup, data sharing, limits and a complete demonstration.
 
 ## Behavior
 
@@ -58,19 +66,19 @@ The default bind address is loopback for local use. For hosted HTTPS deployment,
 
 ## Commands
 
-| Command                                   | Purpose                                            |
-| ----------------------------------------- | -------------------------------------------------- |
-| `npm start`                               | Run frontend and API together                      |
-| `npm run setup`                           | Back up and migrate the configured database        |
-| `npm run setup -- --demo`                 | Also create idempotent local sample data           |
-| `npm run frontend` / `npm run server`     | Run either process separately                      |
-| `npm run build`                           | Build the production frontend                      |
-| `npm test`                                | Run 12 frontend tests and 20 API integration tests |
-| `npm run test:e2e`                        | Build and run two isolated Chromium workflows      |
-| `npm run test:all`                        | Run unit, API and browser tests                    |
-| `npm run backup`                          | Make a private consistent business-data backup     |
-| `npm run restore -- --help`               | Explain new-database recovery                      |
-| `npm run format` / `npm run format:check` | Format or check source files                       |
+| Command                                   | Purpose                                        |
+| ----------------------------------------- | ---------------------------------------------- |
+| `npm start`                               | Run frontend and API together                  |
+| `npm run setup`                           | Back up and migrate the configured database    |
+| `npm run setup -- --demo`                 | Also create idempotent local sample data       |
+| `npm run frontend` / `npm run server`     | Run either process separately                  |
+| `npm run build`                           | Build the production frontend                  |
+| `npm test`                                | Run frontend, provider-contract and API tests  |
+| `npm run test:e2e`                        | Build and run two isolated Chromium workflows  |
+| `npm run test:all`                        | Run unit, API and browser tests                |
+| `npm run backup`                          | Make a private consistent business-data backup |
+| `npm run restore -- --help`               | Explain new-database recovery                  |
+| `npm run format` / `npm run format:check` | Format or check source files                   |
 
 API tests use uniquely named temporary `waypoint_test_*` databases, never the configured business database. The MySQL account needs CREATE/DROP DATABASE privileges. Test cleanup drops only those test databases.
 
@@ -114,6 +122,9 @@ backend/
   receipts.js       private receipt validation, storage and downloads
   report-pdf.js     paginated snapshot reports
   backups.js        consistent backup and new-database recovery
+  ai-service.js     optional OpenAI provider, schemas, timeouts and usage limits
+  ai.js             authorized AI drafts, reviewed imports and receipt application
+  itinerary.js      shared validation for manual items and reviewed AI batches
   schema.js         non-destructive legacy migration
   validation.js     request validation and business errors
 scripts/

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const v = require('./validation');
 const { budgetSummary } = require('./budget');
 const { receiptColumns } = require('./receipts');
+const { itineraryInput } = require('./itinerary');
 
 async function recordTripEvent(c, req, tripId, type, from = null, to = null, comment = '') {
   await c.query(
@@ -140,21 +141,6 @@ function mountFeatures(
     if (['COMPLETED', 'CANCELLED'].includes(trip.status))
       v.fail(409, 'This trip has a read-only itinerary.');
     return trip;
-  }
-  function itineraryInput(body, trip) {
-    const date = v.date(body.item_date, 'Itinerary date');
-    if (date < trip.start_date || date > trip.end_date)
-      v.fail(400, 'Itinerary date must fall within the trip dates.');
-    const time = v.text(body.start_time, 'Time', 5, false);
-    if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) v.fail(400, 'Time must use HH:MM format.');
-    return [
-      date,
-      time || null,
-      v.choice(body.kind, ['ACTIVITY', 'TRANSPORT', 'STAY', 'NOTE'], 'itinerary type'),
-      v.text(body.title, 'Title', 100),
-      v.text(body.location, 'Location', 200, false),
-      v.text(body.notes, 'Notes', 2000, false),
-    ];
   }
   app.post(
     '/api/trips/:id/itinerary',

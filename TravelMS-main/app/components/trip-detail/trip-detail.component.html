@@ -159,6 +159,9 @@
         }
       }
       @if (tab === 'Itinerary') {
+        @if (itineraryEditable) {
+          <app-ai-planner [trip]="data.trip" (saved)="load()" />
+        }
         <div class="section-actions">
           <div>
             <h2>Your days, thoughtfully planned.</h2>
@@ -310,6 +313,7 @@
         </div>
       }
       @if (tab === 'Expenses') {
+        <app-ai-budget [trip]="data.trip" />
         <div class="section-actions">
           <div>
             <h2>The details that add up.</h2>

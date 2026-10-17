@@ -7,6 +7,7 @@ const { budgetSummary } = require('./budget');
 const { mountFeatures, recordTripEvent } = require('./features');
 const { mountReceipts, receiptColumns } = require('./receipts');
 const { reportPdf } = require('./report-pdf');
+const { mountAi } = require('./ai');
 
 const COOKIE = 'waypoint_session';
 const USER_FIELDS =
@@ -55,6 +56,7 @@ function createApp(pool, options = {}) {
       },
     }),
   );
+  app.post('/api/trips/:id/itinerary/import', express.json({ limit: '512kb' }));
   app.use(express.json({ limit: '32kb' }));
   app.use('/api', (req, res, next) => {
     res.set({
@@ -637,6 +639,14 @@ function createApp(pool, options = {}) {
     setSessionCookie,
   });
   mountReceipts(app, pool, { auth, route, transaction, tripAccess });
+  mountAi(app, pool, {
+    auth,
+    route,
+    transaction,
+    tripAccess,
+    ai: options.ai,
+    rateLimit: options.rateLimit !== false,
+  });
   app.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found.' }));
   app.use((error, req, res, next) => {
     if (error.code === 'ER_DUP_ENTRY')

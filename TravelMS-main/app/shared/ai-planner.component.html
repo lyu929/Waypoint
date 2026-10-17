@@ -1,0 +1,189 @@
+<section class="ai-panel panel" aria-labelledby="ai-planner-title">
+  <div class="ai-heading">
+    <span class="ai-symbol"><app-icon name="compass" /></span>
+    <div>
+      <div class="eyebrow">A LITTLE HELP EXPLORING</div>
+      <h2 id="ai-planner-title">AI Trip Planner</h2>
+      <p>Turn your interests into a plan you can make your own.</p>
+    </div>
+    <button
+      type="button"
+      class="secondary"
+      (click)="expanded = !expanded"
+      [attr.aria-expanded]="expanded"
+      aria-controls="ai-planner-body"
+    >
+      {{ expanded ? 'Hide planner' : 'Plan with AI' }}
+    </button>
+  </div>
+  @if (expanded) {
+    <div id="ai-planner-body" class="ai-body">
+      @if (!connection.checking() && !connection.available()) {
+        <p class="ai-note">
+          AI is not connected yet. Ask the workspace owner to enable it. You can keep adding
+          itinerary items manually.
+        </p>
+      }
+      @if (tooLong) {
+        <p class="ai-note">
+          AI planning supports trips of up to 14 days. You can plan longer trips manually.
+        </p>
+      }
+      <form (ngSubmit)="generate()" #preferencesForm="ngForm">
+        <label
+          >What would make this trip yours?<textarea
+            name="aiPreferences"
+            [(ngModel)]="preferences"
+            rows="3"
+            required
+            maxlength="1000"
+            placeholder="Museums, local food, a morning walk, and time to relax…"
+            [disabled]="busy"
+          ></textarea>
+        </label>
+        <div class="ai-request-footer">
+          <label
+            >Travel pace<select
+              aria-label="Travel pace"
+              name="aiPace"
+              [(ngModel)]="pace"
+              [disabled]="busy"
+            >
+              <option value="relaxed">Relaxed</option>
+              <option value="balanced">Balanced</option>
+              <option value="active">Active</option>
+            </select></label
+          >
+          <button
+            class="primary"
+            type="submit"
+            [disabled]="busy || !preferencesForm.valid || !connection.available() || tooLong"
+          >
+            <app-icon name="compass" />{{
+              action === 'generate'
+                ? 'Planning your days…'
+                : draft.length
+                  ? 'Regenerate plan'
+                  : 'Generate plan'
+            }}
+          </button>
+        </div>
+        <p class="ai-disclosure">
+          Generating sends this trip's destination, dates, purpose, budget, existing plans and your
+          preferences to OpenAI. Suggestions do not include verified prices, hours or reservations.
+        </p>
+      </form>
+      @if (error) {
+        <p class="error" role="alert">{{ error }}</p>
+      }
+      @if (feedback) {
+        <p class="ai-feedback" role="status">{{ feedback }}</p>
+      }
+      @if (draft.length) {
+        <form class="ai-draft" (ngSubmit)="save(draftForm.valid)" #draftForm="ngForm">
+          <div class="ai-draft-heading">
+            <div>
+              <span class="ai-badge">DRAFT · NOT SAVED</span>
+              <h3>Your next adventure, sketched out.</h3>
+              <p>{{ summary }}</p>
+            </div>
+          </div>
+          <div class="ai-selection">
+            <span>{{ selected.length }} of {{ draft.length }} selected</span
+            ><button class="text-button" type="button" (click)="selectAll(true)" [disabled]="busy">
+              Select all</button
+            ><button class="text-button" type="button" (click)="selectAll(false)" [disabled]="busy">
+              Clear selection
+            </button>
+          </div>
+          <fieldset [disabled]="busy" class="ai-draft-items">
+            @for (entry of draft; track entry.key; let i = $index) {
+              <article class="ai-draft-card" [class.ai-unselected]="!entry.selected">
+                <div class="ai-card-heading">
+                  <label class="ai-checkbox"
+                    ><input
+                      type="checkbox"
+                      [name]="'selected' + i"
+                      [(ngModel)]="entry.selected"
+                      [attr.aria-label]="'Include activity ' + (i + 1)"
+                    /><span>Activity {{ i + 1 }}</span></label
+                  ><button
+                    class="icon-button danger"
+                    type="button"
+                    (click)="draft.splice(i, 1)"
+                    [attr.aria-label]="'Remove draft activity ' + (i + 1)"
+                  >
+                    <app-icon name="trash" />
+                  </button>
+                </div>
+                <fieldset [disabled]="!entry.selected" class="ai-card-fields">
+                  <div class="form-grid">
+                    <label
+                      >Date<input
+                        type="date"
+                        [name]="'draftDate' + i"
+                        [(ngModel)]="entry.item_date"
+                        [min]="trip.start_date"
+                        [max]="trip.end_date"
+                        [required]="entry.selected" /></label
+                    ><label
+                      >Time (optional)<input
+                        type="time"
+                        [name]="'draftTime' + i"
+                        [(ngModel)]="entry.start_time"
+                    /></label>
+                  </div>
+                  <div class="form-grid">
+                    <label
+                      >Type<select [name]="'draftKind' + i" [(ngModel)]="entry.kind">
+                        @for (kind of kinds; track kind.value) {
+                          <option [value]="kind.value">{{ kind.label }}</option>
+                        }
+                      </select></label
+                    ><label
+                      >Title<input
+                        [name]="'draftTitle' + i"
+                        [(ngModel)]="entry.title"
+                        [required]="entry.selected"
+                        maxlength="100"
+                    /></label>
+                  </div>
+                  <label
+                    >Location (optional)<input
+                      [name]="'draftLocation' + i"
+                      [(ngModel)]="entry.location"
+                      maxlength="200" /></label
+                  ><label
+                    >Notes (optional)<textarea
+                      [name]="'draftNotes' + i"
+                      [(ngModel)]="entry.notes"
+                      maxlength="2000"
+                      rows="2"
+                    ></textarea>
+                  </label>
+                </fieldset>
+              </article>
+            }
+          </fieldset>
+          <p class="field-hint">
+            Review locations and opening hours before you travel. Selected activities will be added
+            alongside your existing itinerary; matching duplicates are skipped.
+          </p>
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="primary"
+              [disabled]="busy || !selected.length || !draftForm.valid"
+            >
+              <app-icon name="check" />{{
+                action === 'save' ? 'Adding activities…' : 'Add selected activities'
+              }}</button
+            ><button type="button" class="secondary" (click)="discard()" [disabled]="busy">
+              Discard draft
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+</section>

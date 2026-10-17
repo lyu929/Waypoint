@@ -21,3 +21,15 @@ For receipts, use fictional demonstration files. Save an expense before attachin
 Do not change a real account password during the presentation. Explain password behavior using the interface and test evidence. Backup/recovery can be explained from the documented commands; an actual recovery should use a new database and never switch the live demo's configuration mid-presentation.
 
 When asked about limitations: the version is local, USD-based and has no booking, payment, email reset or public hosting. Existing records only acquire activity history from new actions. Preserve credit for the original TravelMS project and explain the personal extension accurately.
+
+## Optional AI demonstration
+
+Configure the OpenAI connection before presenting using `TravelMS-main/AI_SETUP.md`. Use fictional trip preferences and receipts; AI requests send the relevant inputs to OpenAI. This part needs internet access and provider allowance. Do not open a real API key on the projector.
+
+1. Create a short Chicago trip, open **Itinerary → Plan with AI**, and enter: "Museums, local food and time to relax." Choose Relaxed and generate a plan.
+2. Explain: "The AI creates a draft. I can edit it and choose which activities to keep. The app checks every date and saves only the activities I confirm."
+3. Change an activity title, deselect another and select **Add selected activities**. Show the saved plan and its Activity event.
+4. On an approved trip, attach a fictional USD receipt and select **Scan with AI**. Explain: "The extracted amount, currency and date must be reviewed. Applying the result updates the expense, while existing report snapshots remain unchanged."
+5. Open the trip's **Expenses → Explain my budget**. Explain: "The server calculates the amounts; AI helps explain this saved spending snapshot."
+
+If the provider is unavailable, show the English connection/error state and continue with manual planning. Automated test fixtures verify the UI without real API calls; describe them as test fixtures, not as live AI output.
